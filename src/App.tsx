@@ -83,6 +83,7 @@ function App() {
 
   useEffect(() => {
     if (initializedRef.current) return;
+    SampleLibrary.baseUrl = import.meta.env.BASE_URL + "/samples/";
     guitar.current = SampleLibrary.load({ instruments: "guitar-electric" });
     document.addEventListener("keydown", (e: KeyboardEvent) => {
       if (e.keyCode === 32) {
