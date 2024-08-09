@@ -32,8 +32,21 @@ async function playCadence({ tone, scaleName }: { scaleName: string }) {
   );
 }
 
-function getRandomDegreeList({ length }: { length: number }) {
-  const degrees = [1, 2, 3, 4, 5, 6, 7, 8];
+function getRandomDegreeList({
+  length,
+  range,
+}: {
+  length: number;
+  range: string;
+}) {
+  let degrees = [1, 2, 3, 4, 5, 6, 7, 8];
+  if (range === "1-4") {
+    degrees = [1, 2, 3, 4];
+  } else if (range === "3-6") {
+    degrees = [3, 4, 5, 6];
+  } else if (range === "5-8") {
+    degrees = [5, 6, 7, 8];
+  }
   const randomDegrees = [];
   for (let i = 0; i < length; i++) {
     const randomIndex = Math.floor(Math.random() * degrees.length);
@@ -70,6 +83,7 @@ function App() {
   const [scaleType, setScaleType] = useState("major");
   const [scaleName, setScaleName] = useState("E4 major");
   const [melodyLength, setMelodyLength] = useState(4);
+  const [range, setRange] = useState("1-8");
   const [degrees, setDegrees] = useState(getRandomDegreeList({ length: 4 }));
   const [instrumentName, setInstrumentName] = useState("guitar-electric");
   const [loaded, setLoaded] = useState(false);
@@ -88,7 +102,10 @@ function App() {
   };
 
   const nextMelody = () => {
-    const newDegrees = getRandomDegreeList({ length: melodyLength });
+    const newDegrees = getRandomDegreeList({
+      length: melodyLength,
+      range: range,
+    });
     setDegrees(newDegrees);
     setRevealed(false);
     // if (instrumentRef.current === null) return;
@@ -134,7 +151,7 @@ function App() {
   useEffect(() => {
     if (!loaded) return;
     nextMelody();
-  }, [melodyLength]); // eslint-disable-line
+  }, [melodyLength, range]); // eslint-disable-line
 
   const noteCards = degrees.map((degree, i) => (
     <NoteCard
@@ -160,6 +177,8 @@ function App() {
     "Bb4",
     "B4",
   ];
+
+  const ranges = ["1-4", "3-6", "5-8", "1-8"];
 
   const scaleTypes = ["major", "minor"];
 
@@ -211,6 +230,16 @@ function App() {
           {scaleTypes.map((t) => (
             <option key={t} value={t}>
               {t}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div>
+        Tones
+        <select value={range} onChange={(e) => setRange(e.target.value)}>
+          {ranges.map((r) => (
+            <option key={r} value={r}>
+              {r}
             </option>
           ))}
         </select>
