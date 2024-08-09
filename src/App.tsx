@@ -5,6 +5,8 @@ import NoteCard from "./NoteCard";
 import { Scale } from "tonal";
 import "./App.css";
 
+import startPitchDetect from "./pitchdetect";
+
 async function playCadence({ tone, scaleName }: { scaleName: string }) {
   const synth = tone.toDestination();
   let degrees = [1, 3, 5];
@@ -82,8 +84,13 @@ function App() {
   const [tonic, setTonic] = useState("C4");
   const [scaleType, setScaleType] = useState("major");
   const [scaleName, setScaleName] = useState("E4 major");
+  const [scaleNameWithoutOctave, setScaleNameWithoutOctave] =
+    useState("E major");
   const [melodyLength, setMelodyLength] = useState(4);
   const [range, setRange] = useState("1-8");
+  const [detectedNote, setDetectedNote] = useState(null);
+  const [detectedDegree, setDetectedDegree] = useState(null);
+  const [detune, setDetune] = useState(null);
   const [degrees, setDegrees] = useState(getRandomDegreeList({ length: 4 }));
   const [instrumentName, setInstrumentName] = useState("guitar-electric");
   const [loaded, setLoaded] = useState(false);
@@ -112,6 +119,28 @@ function App() {
     // playNotes({ degrees: newDegrees, scaleName, tone: instrumentRef.current });
   };
 
+  const heardNote = (note, detune) => {
+    if (detune < -30 || detune > 30) {
+      note = null;
+      detune = null;
+    }
+    setDetectedNote(note);
+    setDetune(detune);
+  };
+
+  useEffect(() => {
+    const degree = Scale.degrees(scaleNameWithoutOctave);
+    for (let i = 1; i <= 8; i++) {
+      if (degree(i) === detectedNote) {
+        const r = document.querySelector(":root");
+        r.style.setProperty("--detune", `${detune}`);
+        setDetectedDegree(i);
+        return;
+      }
+    }
+    setDetectedDegree(null);
+  }, [detectedNote, detune, scaleNameWithoutOctave]);
+
   useEffect(() => {
     if (initializedRef.current || loaded) return;
     SampleLibrary.baseUrl = import.meta.env.BASE_URL + "/samples/";
@@ -120,6 +149,7 @@ function App() {
       setLoaded(true);
     };
     instrumentRef.current = SampleLibrary.load({ instruments: instrumentName });
+    startPitchDetect(heardNote);
     initializedRef.current = true;
   }, [loaded]); // eslint-disable-line
 
@@ -140,6 +170,7 @@ function App() {
 
   useEffect(() => {
     setScaleName(`${tonic} ${scaleType}`);
+    setScaleNameWithoutOctave(tonic.replace(/\d/g, "") + ` ${scaleType}`);
   }, [tonic, scaleType]);
 
   useEffect(() => {
@@ -160,6 +191,7 @@ function App() {
       interval={degree}
       tone={instrumentRef.current}
       revealed={revealed}
+      isHeard={Scale.degrees(scaleNameWithoutOctave)(degree) === detectedNote}
     />
   ));
 

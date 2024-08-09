@@ -7,3 +7,12 @@
     margin: 5px;
     font-size: 1.5em;
 }
+
+.note-card-heard {
+    background-color: rgba(
+        calc((1 - (var(--detune) * var(--detune) / var(--detune) / 50)) * 50),
+        128,
+        0,
+        1
+    );
+}
