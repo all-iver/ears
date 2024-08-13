@@ -35,3 +35,13 @@ select {
     font-size: 2em;
     background-color: green;
 }
+
+.page-buttons {
+    button {
+        background-color: #333;
+        margin: 5px;
+    }
+    button.selected {
+        background-color: #666;
+    }
+}
