@@ -43,7 +43,7 @@ const SettingsPanel = observer(({ showMelodyLength, showDelay }) => {
 
   const melodyLengths = [1, 2, 3, 4, 5, 6, 7, 8];
 
-  const delays = [5000, 2500, 1000, 750, 500];
+  const delays = [5000, 2500, 2000, 1500, 1000, 750, 500];
 
   return (
     <>
