@@ -82,16 +82,46 @@ const AutoPage = observer(({ instrument, detectedNote, detectedDegree }) => {
     };
   }, []);
 
+  let noteCard = null;
+  if (state.isPlaying && state.playingDegree) {
+    const playingDegreeIsHeard =
+      Scale.degrees(settings.scaleNameWithoutOctave)(state.playingDegree) ===
+      detectedNote;
+    noteCard = (
+      <NoteCard
+        note={Scale.degrees(settings.scaleName)(state.playingDegree)}
+        interval={state.playingDegree}
+        tone={instrument}
+        revealed={playingDegreeIsHeard}
+        isHeard={playingDegreeIsHeard}
+      />
+    );
+  }
+
   return (
     <>
-      <button
-        className="small-button"
-        onClick={action(() => {
-          state.isPlaying = !state.isPlaying;
-        })}
-      >
-        {state.isPlaying ? "Stop" : "Start"}
-      </button>
+      <div className="buttons">
+        <button
+          className="small-button"
+          onClick={() =>
+            playCadence({
+              instrument: instrument,
+              scaleName: settings.scaleName,
+            })
+          }
+        >
+          Cadence
+        </button>
+        <button
+          className="small-button"
+          onClick={action(() => {
+            state.isPlaying = !state.isPlaying;
+          })}
+        >
+          {state.isPlaying ? "Stop" : "Start"}
+        </button>
+      </div>
+      {noteCard}
     </>
   );
 });
